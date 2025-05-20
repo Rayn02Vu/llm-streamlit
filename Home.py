@@ -21,7 +21,9 @@ async def main():
     
     message_first = {
         "role": "system",
-        "content": "Bạn hãy đóng vai trợ lý AI thân thiện trả lời chính xác, hãy giúp đỡ nhiều nhất có thể nhé!"
+        "content": """Bạn hãy đóng vai trợ lý AI thân thiện trả lời chính xác, hãy giúp đỡ nhiều nhất có thể nhé! 
+        Lưu ý: hãy trả lời một ngôn ngữ thống nhất, không trả lời lẫn lộn các ngôn ngữ. Ưu tiên trả lời rõ ràng bằng Tiếng Việt.
+        """
     }
     State.messages.append(message_first)
     
