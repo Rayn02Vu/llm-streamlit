@@ -19,6 +19,12 @@ async def main():
     if "messages" not in State:
         State.messages = []
     
+    message_first = {
+        "role": "system",
+        "content": "Bạn hãy đóng vai trợ lý AI thân thiện trả lời chính xác, hãy giúp đỡ nhiều nhất có thể nhé!"
+    }
+    State.messages.append(message_first)
+    
     prompt = st.chat_input("Prompt here...")
     
     if len(State.messages) > 5:
