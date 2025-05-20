@@ -1,49 +1,53 @@
 import streamlit as st
-import time
-  
+from streamlit import session_state as State
+from langchain_openai.chat_models import ChatOpenAI
+
+api_key = st.secrets["CONO_API_KEY"]
+api_base = st.secrets["CONO_API_BASE"]
+
+llm = ChatOpenAI(
+    model_name="cono-3-exp",
+    temperature=0, 
+    api_key=api_key, 
+    base_url=api_base
+)
+
 async def main():
-    st.title("ArcanyBot")
     
+    st.title("ArcanyBot")
     st.sidebar.success("Welcome to ArcanyBot")
     
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
+    if "messages" not in State:
+        State.messages = []
     
     prompt = st.chat_input("Prompt here...")
     
-    for msg in st.session_state.messages:
+    if len(State.messages) > 5:
+        State.messages = [State.messages[0]] + State.messages[-5:]
+        
+    for msg in State.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
     
     if prompt:
         with st.chat_message("user"):
             st.markdown(prompt)
-        st.session_state.messages.append({"role": "user", "content": prompt})
+        State.messages.append({"role": "user", "content": prompt})
         
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             full_response = ""
-            async for response in stream_response(prompt):
-                full_response += response
+            
+            for response in llm.stream(State.messages):
+                
+                full_response += response.content
                 message_placeholder.markdown(full_response + "▌")
+                
             message_placeholder.markdown(full_response)
-        st.session_state.messages.append({"role": "assistant", "content": response})
+            
+        State.messages.append({"role": "assistant", "content": response})
     else:
         st.markdown("### 📝 Type a prompt to get started!")  
-
-
-async def stream_response(prompt):
-    chunks = [
-        "Hello world! ",
-        "I am AcanyBot. ",
-        "I am ",
-        "in offline mode.",
-        " Echo: ",
-        prompt,
-    ]
-    for chunk in chunks:
-        time.sleep(0.25)
-        yield chunk
 
 
 if __name__ == "__main__":
