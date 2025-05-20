@@ -31,6 +31,8 @@ async def main():
         State.messages = [State.messages[0]] + State.messages[-5:]
         
     for msg in State.messages:
+        if msg["role"] == "system":
+            continue
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
     
