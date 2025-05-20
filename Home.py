@@ -38,7 +38,7 @@ async def main():
         with st.chat_message("assistant"):
             st.markdown(response.content)
             
-        State.messages.append({"role": "assistant", "content": response})
+        State.messages.append({"role": "assistant", "content": response.content})
     else:
         st.markdown("### 📝 Type a prompt to get started!")  
 
