@@ -5,12 +5,6 @@ from langchain_openai.chat_models import ChatOpenAI
 api_key = st.secrets["CONO_API_KEY"]
 api_base = st.secrets["CONO_API_BASE"]
 
-llm = ChatOpenAI(
-    model_name="cono-3-exp",
-    temperature=0, 
-    api_key=api_key, 
-    base_url=api_base
-)
 
 async def main():
     
@@ -34,16 +28,10 @@ async def main():
             st.markdown(prompt)
         State.messages.append({"role": "user", "content": prompt})
         
+        response = f"Echo: {prompt}"
+        
         with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            full_response = ""
-            
-            for response in llm.stream(State.messages):
-                
-                full_response += response.content
-                message_placeholder.markdown(full_response + "▌")
-                
-            message_placeholder.markdown(full_response)
+            st.markdown(response)
             
         State.messages.append({"role": "assistant", "content": response})
     else:
