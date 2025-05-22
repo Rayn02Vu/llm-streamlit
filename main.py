@@ -36,8 +36,9 @@ async def main():
     
     st.sidebar.success("### History Data")
     st.sidebar.markdown("#### 📕 Lich_su_Dang.txt")
+    with st.chat_message("assistant"):
+        st.write("Hello! How can I help you today?")
     
-    state.messages.append({"role": "assistant", "content": "Chào bạn! Tôi có thể giúp gì?"})
     
     for item in state.messages:
         with st.chat_message(item["role"]):
