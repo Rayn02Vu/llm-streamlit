@@ -1,4 +1,3 @@
 streamlit
-langchain
-langchain-community
-langchain-openai
+streamlit-shadcn-ui
+requests
