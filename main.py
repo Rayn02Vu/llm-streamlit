@@ -16,7 +16,6 @@ def query(payload):
     return response.json()
 
 
-
 async def main():
     
     if "messages" not in state:
@@ -37,13 +36,20 @@ async def main():
     st.sidebar.success("### History Data")
     st.sidebar.markdown("#### 📕 Lich_su_Dang.txt")
     with st.chat_message("assistant"):
-        st.write("Hello! How can I help you today?")
+        st.write("Chào bạn! Tôi có thể giúp gì?")
     
     
-    for item in state.messages:
+    for i, item in enumerate(state.messages):
         with st.chat_message(item["role"]):
-            st.write(item["content"])
-    
+            st.markdown(item["content"])
+            if "tools" in item:
+                ui.badges(
+                    badge_list=[
+                        (tool["tool"], "secondary") for tool in item["tools"]
+                    ],
+                    class_name="flex gap-4"
+                )
+
     
     if not state.running:
         if new_prompt := st.chat_input("Send a message...", disabled=state.running):
@@ -58,11 +64,19 @@ async def main():
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
                 response = query({"question": state.prompt})
-                with open("res.json", "w") as f:
-                    f.write(json.dumps(response, indent=4))
+                bot_data = {
+                    "role": "assistant",
+                    "content": response["text"]
+                }
+                tool = response["agentReasoning"][0]["usedTools"][0]
+                if tool:
+                    bot_data["tools"] = [{
+                        "tool": tool["tool"],
+                        "toolOutput": tool["toolOutput"][:150]  
+                    }]
                 
                 state.running = False
-                state.messages.append({"role": "assistant", "content": response["text"]})
+                state.messages.append(bot_data)
                 state.prompt = ""
                 st.rerun()
 
