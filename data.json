@@ -1,0 +1,28 @@
+{
+    "text": "Hello! How can I assist you today?",
+    "question": "hello",
+    "chatId": "0f5bc688-033f-4aa5-b5e5-273d56a0f17b",
+    "chatMessageId": "62e8ec44-12e7-4cc1-86d2-baa3a232eb0d",
+    "sessionId": "0f5bc688-033f-4aa5-b5e5-273d56a0f17b",
+    "memoryType": "SQLite Agent Memory",
+    "agentReasoning": [
+        {
+            "agentName": "AryanHistory",
+            "messages": [
+                "Hello! How can I assist you today?"
+            ],
+            "usedTools": [
+                null
+            ],
+            "sourceDocuments": [
+                null
+            ],
+            "artifacts": [
+                null
+            ],
+            "state": {},
+            "nodeName": "seqAgent",
+            "nodeId": "seqAgent_0"
+        }
+    ]
+}

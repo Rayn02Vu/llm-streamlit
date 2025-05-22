@@ -2,7 +2,7 @@ import json
 import streamlit as st
 from streamlit import session_state as state
 import streamlit_shadcn_ui as ui
-import requests
+import requests, uuid
 
 
 api_base = st.secrets["FLOW_API_BASE"]
@@ -24,6 +24,8 @@ async def main():
         state.running = False
     if "prompt" not in state:
         state.prompt = ""
+    if "sessionId" not in state:
+        state.sessionId = ""
     
     st.title("AcanyBot 🤖")
     ui.badges(
@@ -39,18 +41,19 @@ async def main():
         st.write("Chào bạn! Tôi có thể giúp gì?")
     
     
-    for i, item in enumerate(state.messages):
+    for item in state.messages:
+        print(item)
         with st.chat_message(item["role"]):
             st.markdown(item["content"])
             if "tools" in item:
-                ui.badges(
-                    badge_list=[
-                        (tool["tool"], "secondary") for tool in item["tools"]
-                    ],
-                    class_name="flex gap-4"
-                )
+                if item["tools"]:
+                    ui.badges(
+                        badge_list=[
+                        (item["tools"][i]["tool"], "secondary") for i in range(len(item["tools"]))],
+                        key=uuid.uuid4().hex
+                    )
 
-    
+
     if not state.running:
         if new_prompt := st.chat_input("Send a message...", disabled=state.running):
             state.prompt = new_prompt
@@ -63,22 +66,34 @@ async def main():
     if state.running:
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
-                response = query({"question": state.prompt})
+                payload = {"question": state.prompt}
+                if state.sessionId:
+                    payload["overrideConfig"] = {"sessionId": state.sessionId}
+                    
+                response = query(payload)
+                state.sessionId = response["sessionId"]
+                    
                 bot_data = {
                     "role": "assistant",
                     "content": response["text"]
                 }
-                tool = response["agentReasoning"][0]["usedTools"][0]
-                if tool:
-                    bot_data["tools"] = [{
-                        "tool": tool["tool"],
-                        "toolOutput": tool["toolOutput"][:150]  
-                    }]
+            
+                try:
+                    tool = response["agentReasoning"][0]["usedTools"][0]
+                    if tool:
+                        bot_data["tools"] = [{
+                            "tool": tool["tool"],
+                            "toolOutput": tool["toolOutput"][:150]  
+                        }]
+                        
+                except Exception as e:
+                    print(e)
                 
-                state.running = False
-                state.messages.append(bot_data)
-                state.prompt = ""
-                st.rerun()
+                finally:
+                    state.running = False
+                    state.messages.append(bot_data)
+                    state.prompt = ""
+                    st.rerun()
 
 
 if __name__ == "__main__":
